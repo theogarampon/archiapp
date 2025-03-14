@@ -77,7 +77,7 @@ document.getElementById("sendButton").addEventListener("click", () => {
     const messageText = document.getElementById("messageInput").value.trim();
     if (messageText !== "") {
         const encodedMessage = encodeURIComponent(messageText);
-        fetch(`http://localhost:8080/msg/post/${encodedMessage}`)
+        fetch(`https://archiapp-tp2.onrender.com/msg/post/${encodedMessage}`)
             .then(response => response.json())
             .then(data => {
                 console.log("Message posté, nouvel index:", data.newIndex);
@@ -97,7 +97,7 @@ document.getElementById("toggleStyle").addEventListener("click", () => {
 
 updateMessagesFromServer();
 
-fetch('http://localhost:8080/msg/getAll')
+fetch('https://archiapp-tp2.onrender.com/msg/getAll')
     .then(response => response.json())
     .then(data => {
         if (data.length > 0) {
