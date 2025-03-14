@@ -52,7 +52,7 @@ document.getElementById("toggleStyle").addEventListener("click", () => {
  * TP2 partie 3
  */
 function updateMessagesFromServer() {
-    fetch('http://localhost:8080/msg/getAll')
+    fetch('https://archiapp-tp2.onrender.com/msg/getAll')
         .then(response => response.json())
         .then(data => {
             const messageList = document.getElementById("messageList");
