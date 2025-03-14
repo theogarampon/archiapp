@@ -45,14 +45,22 @@ app.get('/cpt/inc', function (req, res) {
     }
 });
 
+// Liste des messages (désormais sous forme d'objets avec pseudo et date)
+const allMsgs = [
+    { msg: "Hello World", pseudo: "Alice", date: "2025-03-14 10:00:00" },
+    { msg: "foobar", pseudo: "Bob", date: "2025-03-14 10:01:00" },
+    { msg: "CentraleSupelec Forever", pseudo: "Charlie", date: "2025-03-14 10:02:00" }
+];
 
-var allMsgs = ["Hello World", "foobar", "CentraleSupelec Forever"];
+// Récupérer tous les messages
+app.get('/msg/getAll', (req, res) => res.json(allMsgs));
 
-// /msg/get/* : renvoie le message dont l'indice est passé dans l'URL
-// Exemple : /msg/get/2 renvoie { "code": 1, "msg" : "CentraleSupelec Forever" }
-app.get('/msg/get/*', function (req, res) {
-    const indexStr = req.url.substr(9); // "/msg/get/" fait 9 caractères
-    const index = parseInt(indexStr, 10);
+// Obtenir le nombre de messages
+app.get('/msg/nber', (req, res) => res.json({ "nber": allMsgs.length }));
+
+// Récupérer un message par son numéro
+app.get('/msg/get/:id', (req, res) => {
+    const index = parseInt(req.params.id, 10);
     if (!isNaN(index) && index >= 0 && index < allMsgs.length) {
         res.json({ "code": 1, "msg": allMsgs[index] });
     } else {
@@ -60,28 +68,22 @@ app.get('/msg/get/*', function (req, res) {
     }
 });
 
-
-app.get('/msg/nber', function (req, res) {
-    res.json({ "nber": allMsgs.length });
-});
-
-
-app.get('/msg/getAll', function (req, res) {
-    res.json(allMsgs);
-});
-
-
-app.get('/msg/post/*', function (req, res) {
-    let messageEncoded = req.url.substr(10);
-    let message = unescape(messageEncoded);
-    allMsgs.push(message);
+// Ajouter un message (pseudo pris en paramètre GET facultatif)
+app.get('/msg/post/:message', (req, res) => {
+    const message = decodeURIComponent(req.params.message);
+    const pseudo = req.query.pseudo ? decodeURIComponent(req.query.pseudo) : "Anonyme";
+    const newMessage = {
+        msg: message,
+        pseudo: pseudo,
+        date: new Date().toLocaleString()
+    };
+    allMsgs.push(newMessage);
     res.json({ "newIndex": allMsgs.length - 1 });
 });
 
-
-app.get('/msg/del/*', function (req, res) {
-    const indexStr = req.url.substr(9);
-    const index = parseInt(indexStr, 10);
+// Supprimer un message par son numéro
+app.get('/msg/del/:id', (req, res) => {
+    const index = parseInt(req.params.id, 10);
     if (!isNaN(index) && index >= 0 && index < allMsgs.length) {
         allMsgs.splice(index, 1);
         res.json({ "code": 0 });
@@ -89,7 +91,6 @@ app.get('/msg/del/*', function (req, res) {
         res.json({ "code": -1 });
     }
 });
-
 
 app.listen(8080);
 console.log("App listening on port 8080...");

@@ -51,59 +51,58 @@ document.getElementById("toggleStyle").addEventListener("click", () => {
 /**
  * TP2 partie 3
  */
+const SERVER_URL = "https://archiapp-tp2.onrender.com";
+
+// Met à jour l'affichage des messages depuis TP2
 function updateMessagesFromServer() {
-    fetch('https://archiapp-tp2.onrender.com/msg/getAll')
+    fetch(`${SERVER_URL}/msg/getAll`)
         .then(response => response.json())
-        .then(data => {
+        .then(messages => {
             const messageList = document.getElementById("messageList");
-            messageList.innerHTML = "";
-            data.forEach(msg => {
+            messageList.innerHTML = ""; // Effacer les anciens messages
+
+            messages.forEach(({ pseudo, date, msg }) => {
                 const li = document.createElement("li");
-                li.textContent = msg;
+                li.textContent = `${pseudo} [${date}] : ${msg}`;
                 messageList.appendChild(li);
             });
         })
-        .catch(error => {
-            console.error("Erreur lors de la récupération des messages :", error);
-        });
+        .catch(error => console.error("⚠️ Erreur récupération messages :", error));
 }
 
-document.getElementById("updateButton").addEventListener("click", () => {
-    updateMessagesFromServer();
-});
-
+// Envoie un message à TP2 et met à jour l'affichage
 document.getElementById("sendButton").addEventListener("click", () => {
-    const pseudo = document.getElementById("pseudoInput").value.trim();
-    const messageText = document.getElementById("messageInput").value.trim();
+    const pseudo = encodeURIComponent(document.getElementById("pseudoInput").value.trim() || "Anonyme");
+    const messageText = encodeURIComponent(document.getElementById("messageInput").value.trim());
+
     if (messageText !== "") {
-        const encodedMessage = encodeURIComponent(messageText);
-        fetch(`https://archiapp-tp2.onrender.com/msg/post/${encodedMessage}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log("Message posté, nouvel index:", data.newIndex);
-                updateMessagesFromServer();
-            })
-            .catch(error => {
-                console.error("Erreur lors du post du message :", error);
-            });
+        fetch(`${SERVER_URL}/msg/post/${messageText}?pseudo=${pseudo}`)
+            .then(() => updateMessagesFromServer()) // Rafraîchir la liste
+            .catch(error => console.error("⚠️ Erreur lors de l'envoi :", error));
+
+        // 🔄 Réinitialiser les champs
         document.getElementById("messageInput").value = "";
         document.getElementById("pseudoInput").value = "";
     }
 });
 
+// Rafraîchir les messages avec le bouton "Mise à jour"
+document.getElementById("updateButton").addEventListener("click", updateMessagesFromServer);
+
+// Supprimer un message (en demandant son index)
+document.getElementById("deleteButton").addEventListener("click", () => {
+    const messageIndex = prompt("Entrez l'index du message à supprimer :");
+    if (messageIndex !== null) {
+        fetch(`${SERVER_URL}/msg/del/${messageIndex}`)
+            .then(() => updateMessagesFromServer())
+            .catch(error => console.error("⚠️ Erreur lors de la suppression :", error));
+    }
+});
+
+// Basculer entre le mode clair et sombre
 document.getElementById("toggleStyle").addEventListener("click", () => {
     document.body.classList.toggle("dark-mode");
 });
 
+// Charger les messages au démarrage
 updateMessagesFromServer();
-
-fetch('https://archiapp-tp2.onrender.com/msg/getAll')
-    .then(response => response.json())
-    .then(data => {
-        if (data.length > 0) {
-            alert(data[0]);
-        }
-    })
-    .catch(error => {
-        console.error('Erreur lors de la récupération des messages :', error);
-    });
