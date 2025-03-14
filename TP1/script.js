@@ -53,13 +53,12 @@ document.getElementById("toggleStyle").addEventListener("click", () => {
  */
 const SERVER_URL = "https://archiapp-tp2.onrender.com";
 
-// Met à jour l'affichage des messages depuis TP2
 function updateMessagesFromServer() {
     fetch(`${SERVER_URL}/msg/getAll`)
         .then(response => response.json())
         .then(messages => {
             const messageList = document.getElementById("messageList");
-            messageList.innerHTML = ""; // Effacer les anciens messages
+            messageList.innerHTML = "";
 
             messages.forEach(({ pseudo, date, msg }) => {
                 const li = document.createElement("li");
@@ -67,42 +66,58 @@ function updateMessagesFromServer() {
                 messageList.appendChild(li);
             });
         })
-        .catch(error => console.error("⚠️ Erreur récupération messages :", error));
+        .catch(error => console.error("Erreur récupération messages :", error));
 }
 
-// Envoie un message à TP2 et met à jour l'affichage
-document.getElementById("sendButton").addEventListener("click", () => {
-    const pseudo = encodeURIComponent(document.getElementById("pseudoInput").value.trim() || "Anonyme");
-    const messageText = encodeURIComponent(document.getElementById("messageInput").value.trim());
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM chargé !");
 
-    if (messageText !== "") {
-        fetch(`${SERVER_URL}/msg/post/${messageText}?pseudo=${pseudo}`)
-            .then(() => updateMessagesFromServer()) // Rafraîchir la liste
-            .catch(error => console.error("⚠️ Erreur lors de l'envoi :", error));
+    const sendButton = document.getElementById("sendButton");
+    const updateButton = document.getElementById("updateButton");
+    const toggleButton = document.getElementById("toggleStyle");
+    const pseudoInput = document.getElementById("pseudoInput");
+    const messageInput = document.getElementById("messageInput");
 
-        // 🔄 Réinitialiser les champs
-        document.getElementById("messageInput").value = "";
-        document.getElementById("pseudoInput").value = "";
+    if (!sendButton || !updateButton || !toggleButton || !pseudoInput || !messageInput) {
+        console.error("Erreur : Certains éléments HTML sont introuvables !");
+        return;
     }
-});
 
-// Rafraîchir les messages avec le bouton "Mise à jour"
-document.getElementById("updateButton").addEventListener("click", updateMessagesFromServer);
+    sendButton.addEventListener("click", () => {
+        const pseudo = encodeURIComponent(pseudoInput.value.trim() || "Anonyme");
+        const messageText = encodeURIComponent(messageInput.value.trim());
 
-// Supprimer un message (en demandant son index)
-document.getElementById("deleteButton").addEventListener("click", () => {
-    const messageIndex = prompt("Entrez l'index du message à supprimer :");
-    if (messageIndex !== null) {
-        fetch(`${SERVER_URL}/msg/del/${messageIndex}`)
-            .then(() => updateMessagesFromServer())
-            .catch(error => console.error("⚠️ Erreur lors de la suppression :", error));
+        if (messageText !== "") {
+            fetch(`${SERVER_URL}/msg/post/${messageText}?pseudo=${pseudo}`)
+                .then(() => updateMessagesFromServer()) // Rafraîchir la liste
+                .catch(error => console.error("Erreur lors de l'envoi :", error));
+
+            messageInput.value = "";
+            pseudoInput.value = "";
+        }
+    });
+
+    updateButton.addEventListener("click", updateMessagesFromServer);
+
+    const deleteButton = document.getElementById("deleteButton");
+
+    if (deleteButton) {
+        deleteButton.addEventListener("click", () => {
+            const messageIndex = prompt("Entrez l'index du message à supprimer :");
+            if (messageIndex !== null) {
+                fetch(`${SERVER_URL}/msg/del/${messageIndex}`)
+                    .then(() => updateMessagesFromServer())
+                    .catch(error => console.error("Erreur lors de la suppression :", error));
+            }
+        });
+    } else {
+        console.warn("Bouton de suppression non trouvé dans l'HTML.");
     }
-});
 
-// Basculer entre le mode clair et sombre
-document.getElementById("toggleStyle").addEventListener("click", () => {
-    document.body.classList.toggle("dark-mode");
-});
+    //Basculer entre le mode clair et sombre
+    toggleButton.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+    });
 
-// Charger les messages au démarrage
-updateMessagesFromServer();
+    updateMessagesFromServer();
+});
