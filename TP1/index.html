@@ -1,33 +1,38 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site de dépôt de messages</title>
-    <link href="style.css" rel="stylesheet" type="text/css">
-  </head>
-  <body>
-    <header>
-      <h1>Bienvenue sur le site de dépôt de messages</h1>
-    </header>
-    
-    <section id="messagesSection">
-      <h2>Liste des messages</h2>
-      <ul id="messageList">
-        <li>Message 1</li>
-        <li>Message 2</li>
-        <li>Message 3</li>
-        <li>Message 4</li>
-        <li>Message 5</li>
-      </ul>
-    </section>
-    
-    <section id="inputSection">
-      <h2>Poster un message</h2>
-      <textarea id="messageInput" placeholder="Tapez votre message ici"></textarea>
-      <button id="sendButton">Envoyer</button>
-    </section>
-    
-    <script src="script.js"></script>
-  </body>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site de dépôt de messages</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header>
+    <h1>Bienvenue sur le site de dépôt de messages</h1>
+  </header>
+
+  <section id="messagesSection">
+    <h2>Liste des messages</h2>
+    <ul id="messageList">
+    </ul>
+    <button id="updateButton">Mise à jour</button>
+  </section>
+
+  <section id="inputSection">
+    <h2>Poster un message</h2>
+    <input type="text" id="pseudoInput" placeholder="Votre pseudo">
+    <textarea id="messageInput" placeholder="Tapez votre message ici"></textarea>
+    <button id="sendButton">Envoyer</button>
+  </section>
+
+  <section id="styleSection">
+    <h2>Changer le style</h2>
+    <button id="toggleStyle">style de la page (Clair/Sombre)</button>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+
 </html>
